@@ -5,11 +5,14 @@ import Header from "../../components/Header/Header";
 import OfflineBanner from "../../components/OfflineBanner/OfflineBanner";
 import ExpenseSkeleton from "../../components/Skeletons/ExpenseSkeleton";
 import useNetworkStatus from "../../hooks/useNetworkStatus";
+import useTheme from "../../hooks/useTheme";
 import styles from "./Home.styles";
 
 export default function HomeScreen() {
   const { data, isLoading, isFetching, refetch, error } = useExpenses();
   const isConnected = useNetworkStatus();
+  const { colors } = useTheme();
+
   if (isLoading) {
     return (
       <View style={styles.container}>
@@ -33,7 +36,7 @@ export default function HomeScreen() {
   if (data && data.length === 0) {
     return (
       <View style={{ flex: 1 }}>
-        {/* <Header title="My Expenses" /> */}
+        <Header title="My Expenses" showThemeSwitcher />
         {!isConnected && <OfflineBanner />}
 
         <EmptyState
@@ -59,10 +62,14 @@ export default function HomeScreen() {
           <RefreshControl refreshing={isFetching} onRefresh={refetch} />
         }
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <View style={[styles.item, { backgroundColor: colors.surface }]}>
             <View>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.subtitle}>{item.category}</Text>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>
+                {item.title}
+              </Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                {item.category}
+              </Text>
             </View>
             <Text style={styles.amount}>${item.amount}</Text>
           </View>

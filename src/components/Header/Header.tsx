@@ -1,40 +1,41 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useTheme from "../../hooks/useTheme";
+import { useThemeStore } from "../../store/theme.store";
 
 type Props = {
   title: string;
-  backgroundColor?: string;
-  textColor?: string;
+  showThemeSwitcher?: boolean;
 };
-const Header = ({
-  title,
-  backgroundColor = "#2563EB",
-  textColor = "#fff",
-}: Props) => {
+
+export default function Header({ title, showThemeSwitcher = false }: Props) {
+  const { colors, mode } = useTheme();
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
+
   return (
-    <SafeAreaView
-      edges={["top"]}
-      style={[styles.safeArea, { backgroundColor }]}
-    >
+    <SafeAreaView edges={["top"]} style={{ backgroundColor: colors.primary }}>
       <View style={styles.container}>
-        <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+        <Text style={styles.title}>{title}</Text>
+
+        {showThemeSwitcher && (
+          <Switch value={mode === "dark"} onValueChange={toggleTheme} />
+        )}
       </View>
     </SafeAreaView>
   );
-};
-
-export default Header;
+}
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: "#2563EB",
-  },
   container: {
     paddingHorizontal: 16,
     paddingBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
+    color: "#fff",
   },
 });
