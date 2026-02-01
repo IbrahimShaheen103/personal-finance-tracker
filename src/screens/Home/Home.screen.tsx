@@ -1,10 +1,14 @@
 import { FlatList, RefreshControl, Text, View } from "react-native";
 import { useExpenses } from "../../api/expenses.queries";
+import EmptyState from "../../components/EmptyState/EmptyState";
+import OfflineBanner from "../../components/OfflineBanner/OfflineBanner";
 import ExpenseSkeleton from "../../components/Skeletons/ExpenseSkeleton";
+import useNetworkStatus from "../../hooks/useNetworkStatus";
 import styles from "./Home.styles";
 
 export default function HomeScreen() {
   const { data, isLoading, isFetching, refetch, error } = useExpenses();
+  const isConnected = useNetworkStatus();
   if (isLoading) {
     return (
       <View style={styles.container}>
@@ -15,7 +19,7 @@ export default function HomeScreen() {
     );
   }
 
-  // 2️⃣ Error + no cached data
+  //  Error + no cached data
   if (error && !data) {
     return (
       <View style={styles.container}>
@@ -24,24 +28,43 @@ export default function HomeScreen() {
       </View>
     );
   }
+  // Empty state (no expenses)
+  if (data && data.length === 0) {
+    return (
+      <View style={{ flex: 1 }}>
+        {!isConnected && <OfflineBanner />}
 
+        <EmptyState
+          title="No expenses yet"
+          description={
+            isConnected
+              ? "Start adding your expenses to see them here."
+              : "You are offline. Connect to the internet and try again."
+          }
+        />
+      </View>
+    );
+  }
   return (
-    <FlatList
-      contentContainerStyle={styles.container}
-      data={data}
-      keyExtractor={(item) => item.id}
-      refreshControl={
-        <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-      }
-      renderItem={({ item }) => (
-        <View style={styles.item}>
-          <View>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.subtitle}>{item.category}</Text>
+    <View style={{ flex: 1 }}>
+      {!isConnected && <OfflineBanner />}
+      <FlatList
+        contentContainerStyle={styles.container}
+        data={data}
+        keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+        }
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <View>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.subtitle}>{item.category}</Text>
+            </View>
+            <Text style={styles.amount}>${item.amount}</Text>
           </View>
-          <Text style={styles.amount}>${item.amount}</Text>
-        </View>
-      )}
-    />
+        )}
+      />
+    </View>
   );
 }
