@@ -1,6 +1,7 @@
 import { FlatList, RefreshControl, Text, View } from "react-native";
 import { useExpenses } from "../../api/expenses.queries";
 import EmptyState from "../../components/EmptyState/EmptyState";
+import Header from "../../components/Header/Header";
 import OfflineBanner from "../../components/OfflineBanner/OfflineBanner";
 import ExpenseSkeleton from "../../components/Skeletons/ExpenseSkeleton";
 import useNetworkStatus from "../../hooks/useNetworkStatus";
@@ -32,6 +33,7 @@ export default function HomeScreen() {
   if (data && data.length === 0) {
     return (
       <View style={{ flex: 1 }}>
+        {/* <Header title="My Expenses" /> */}
         {!isConnected && <OfflineBanner />}
 
         <EmptyState
@@ -47,6 +49,7 @@ export default function HomeScreen() {
   }
   return (
     <View style={{ flex: 1 }}>
+      <Header title="My Expenses" />
       {!isConnected && <OfflineBanner />}
       <FlatList
         contentContainerStyle={styles.container}
