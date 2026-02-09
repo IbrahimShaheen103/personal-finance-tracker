@@ -36,7 +36,6 @@ export default function HomeScreen() {
   if (data && data.length === 0) {
     return (
       <View style={{ flex: 1 }}>
-        <Header title="My Expenses" showThemeSwitcher />
         {!isConnected && <OfflineBanner />}
 
         <EmptyState
