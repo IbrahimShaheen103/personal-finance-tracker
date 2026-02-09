@@ -1,4 +1,7 @@
-import { FlatList, RefreshControl, Text, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useCallback } from "react";
+import { FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 import { useExpenses } from "../../api/expenses.queries";
 import EmptyState from "../../components/EmptyState/EmptyState";
 import Header from "../../components/Header/Header";
@@ -6,12 +9,21 @@ import OfflineBanner from "../../components/OfflineBanner/OfflineBanner";
 import ExpenseSkeleton from "../../components/Skeletons/ExpenseSkeleton";
 import useNetworkStatus from "../../hooks/useNetworkStatus";
 import useTheme from "../../hooks/useTheme";
+import { RootStackParamList } from "../../navigation/RootNavigator";
 import styles from "./Home.styles";
 
-export default function HomeScreen() {
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, "Home">;
+
+export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { data, isLoading, isFetching, refetch, error } = useExpenses();
   const isConnected = useNetworkStatus();
   const { colors } = useTheme();
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   if (isLoading) {
     return (
@@ -46,9 +58,17 @@ export default function HomeScreen() {
               : "You are offline. Connect to the internet and try again."
           }
         />
+
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate("AddExpense")}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
       </View>
     );
   }
+
   return (
     <View style={{ flex: 1 }}>
       <Header title="My Expenses" />
@@ -61,7 +81,12 @@ export default function HomeScreen() {
           <RefreshControl refreshing={isFetching} onRefresh={refetch} />
         }
         renderItem={({ item }) => (
-          <View style={[styles.item, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity
+            style={[styles.item, { backgroundColor: colors.surface }]}
+            onPress={() =>
+              navigation.navigate("ExpenseDetails", { id: item.id })
+            }
+          >
             <View>
               <Text style={[styles.title, { color: colors.textPrimary }]}>
                 {item.title}
@@ -71,9 +96,16 @@ export default function HomeScreen() {
               </Text>
             </View>
             <Text style={styles.amount}>${item.amount}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate("AddExpense")}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 }

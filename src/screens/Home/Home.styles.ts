@@ -24,4 +24,25 @@ export default StyleSheet.create({
   amount: {
     fontWeight: "700",
   },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#3b82f6",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  fabText: {
+    color: "#ffffff",
+    fontSize: 28,
+    fontWeight: "300",
+  },
 });
